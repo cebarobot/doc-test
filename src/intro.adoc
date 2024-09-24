@@ -1,7 +1,11 @@
 [[intro]]
-== Introduction
+== 介绍
 
-Lorem ipsum indexterm:[Lorem ipsum] dolor sit amet, consectetur adipiscing elit, sed do *eiusmod tempor* incididunt ut labore et dolore magna aliqua. Felis imperdiet proin fermentum leo vel orci porta. Volutpat lacus laoreet non curabitur indexterm:[curabitur] gravida indexterm:[gravida]. Posuere urna nec tincidunt praesent semper feugiat nibh. Elit ``ullamcorper`` dignissim cras tincidunt lobortis. Malesuada fames ac turpis egestas integer eget. Tristique sollicitudin nibh sit amet commodo. Sed felis eget velit aliquet. Sit amet aliquam id diam maecenas ultricies mi. Consectetur purus ut faucibus pulvinar. Lectus urna duis convallis convallis tellus id. Fermentum iaculis eu non diam. Feugiat in fermentum posuere urna nec tincidunt praesent semper feugiat. Urna nec tincidunt praesent semper feugiat nibh.
+香山的MMU模块由L1 TLB，Repeater，L2 TLB，PMP和PMA模块组成，其中L2TLB模块又分为Page Cache、Page Table Walker、Last Level Page Table Walker、Miss Queue和Prefetcher五部分。在核内进行内存读写，包括 *前端取指* 和 ``后端访存`` 之前，都需要由MMU模块进行地址翻译。前端取指和后端访存分别通过ITLB和DTLB进行地址翻译，均为非阻塞式访问，TLB需要返回请求是否miss，返回给请求来源，并由请求来源调度重新发送TLB查询请求，indexterm:[直至命中]。对于miss的Load请求，昆明湖架构支持TLB Hint，即当L2 TLB refill页表至L1 TLB时，可以精准唤醒因该虚拟地址TLB miss而导致阻塞的Load 指令。当L1 TLB（ITLB和DTLB）发生miss时，会访问L2 TLB。如果L2 TLB依然miss，则会通过Page Table Walker访问内存中的页表。
+
+Repeater是L1 TLB到L2 TLB的请求缓冲，在L1 TLB和L2 TLB之间存在较长的物理距离，需要通过Repeater在中间加拍。由于ITLB和DTLB均支持多个outstanding的请求，因此repeater会同时承担类似MSHR的功能，并过滤重复请求。MMU模块支持对物理地址访问进行权限检查，分为PMP和PMA两部分。PMP和PMA检查并行查询，违反任一权限即为非法操作。对核内所有的物理地址访问都需要进行物理地址权限检查，包括在ITLB和DTLB检查之后，以及Page Table Walker访存之前。
+
+增加H拓展后，L2TLB内新增了Hypervisor Page Table Walker模块，主要负责第二阶段的翻译，并且对L2TLB的架构进行了部分修改。
 
 .Nonsensical code
 [source, python]

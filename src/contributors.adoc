@@ -1,6 +1,6 @@
-== Contributors
+== 编者列表
 
-This RISC-V specification has been contributed to directly or indirectly by:
+以下开发者参与了文档的撰写：
 
 [%hardbreaks]
 * Author1 <required1@email.com>
